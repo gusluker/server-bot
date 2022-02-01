@@ -1,0 +1,10 @@
+[
+	{
+		"Email": "correo1@correo.com",
+		"ClientID": "",
+		"ClientSecret": "",
+		"AccessToken": "",
+		"RefreshToken": "",
+		"TokenType": "Bearer"
+	}
+]

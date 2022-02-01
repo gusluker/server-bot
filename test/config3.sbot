@@ -1,0 +1,21 @@
+{
+	"mail-list": {
+		"world": ["correo1@correo.com", "correo2@correo.com"],
+		"co.Valle del Cauca.Cali": [
+			"correo3@correo.com", 
+			"correo4@correo.com",
+			"correo5@correo.com"
+		],
+		"co.Valle del Cauca.Buenaventura": "correo6@correo.com",
+		"co.Huila.Pitalito": "correo7@correo.com",
+		"co.Huila.Palestina": "correo8@correo.com",
+		"co.Valle del Cauca": "correo9@correo.com",
+		"co.Huila": "correo10@correo.com",
+		"co":"correo11@correo.com",
+		"ec.Pichincha.Quito":"correo1@proton.com",
+		"ec.Manabí.Manta":["correo2@proton.com","correo3@proton.com"],
+		"ec.Manabí.Jaramijó":"correo4@proton.com",
+		"ec.Manabí":["correo5@proton.com","correo6@proton.com"],
+		"ec":"correo7@proton.com"
+	}
+}

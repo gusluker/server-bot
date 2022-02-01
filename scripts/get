@@ -1,0 +1,41 @@
+#!/usr/bin/python
+
+import urllib.request
+import sys
+import json
+
+if len(sys.argv) < 3:
+    print("Error de estructura. \nLa estructura esperada es: get [lat] [lon]")
+    exit(0)
+
+print("get [lat] [lon]")
+
+content = urllib.request.urlopen("https://nominatim.openstreetmap.org/reverse.php?lat=" + sys.argv[1] + "&lon=" + sys.argv[2] + "&format=jsonv2").read()
+
+data = json.loads(content)
+
+address = data["address"]
+city = address.get("county")
+if city == None:
+    city = address.get("city")
+    if city == None:
+        city = address.get("town")
+        if city == None:
+            city = address.get("suburb")
+            if city == None:
+                city = address.get("village")
+                if city == None:
+                    print("no se recibió respuesta esperada por el servicio de geo reverse")
+                    exit(1)
+
+country = address["country_code"]
+state = address["state"]
+
+city = city.lower()
+state = state.lower()
+country = country.lower()
+
+print("\nCountry: " + country)
+print("State: " + state)
+print("City: " + city)
+print("Path: " + country + "." + state+ "." + city)
