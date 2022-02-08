@@ -20,17 +20,28 @@ type Sor struct {
 type Controller struct {
 	Publisher	*ControllerPublisher
 	Channel 	chan *models.Data
+	ChannelLoc	chan *models.Data
 	Quit 		chan int
 }
 
+const (
+	MAX_N_LOC_THREADS = 4
+	MAX_N_THREADS = 100
+)
+
 func New(subscribers []ControllerObserver) *Controller {
 	controller := &Controller {
-		Channel: make(chan *models.Data, 50),
+		Channel: make(chan *models.Data, MAX_N_THREADS),
+		ChannelLoc: make(chan *models.Data, MAX_N_THREADS),
 		Quit: make(chan int),
 		Publisher: NewControllerPublisher(subscribers),
 	}
 
 	go controller.work()
+	for i :=0 ; i < MAX_N_LOC_THREADS; i += 1 {
+		go controller.workLocation()
+	}
+
 	return controller
 }
 
@@ -38,13 +49,18 @@ func (controller *Controller) work() {
 	for {
 		select {
 		case data := <- controller.Channel:
-			if data.Loc == nil {
-				go controller.process(data)
-			} else {
-				controller.Publisher.Notify(data)
-			}
+			controller.Publisher.Notify(data)
 		case <- controller.Quit:
 			return
+		}
+	}
+}
+
+func (controller *Controller) workLocation() {
+	for {
+		select {
+		case data := <- controller.ChannelLoc:
+			controller.process(data)
 		}
 	}
 }
@@ -63,6 +79,8 @@ func (controller *Controller) process(data *models.Data) {
 	} else {
 		log.Errorf("No se pudo obtener la geolocalización del dato %s: %s", data.Index, err)
 	}
+
+	log.Debugf("Liberando hilo de procesamiento de geolocalización Lat=%s Lon=%s", data.Coord.Latitude, data.Coord.Longitude)
 }
 
 func (controller *Controller) Exit() {
@@ -121,12 +139,22 @@ func (sor *Sor) sorter() (int, string) {
 func (controller *Controller) workQueue(data *models.Data) int {
 	var retval int	
 
-	select {
-	case controller.Channel <- data:
-		log.Debugf("Sorter; Dato \"%s\" en cola de trabajo", data.Index)
-		retval = http.StatusOK
-	default:
-		retval = http.StatusServiceUnavailable
+	if data.Loc != nil {
+		select {
+		case controller.Channel <- data:
+			log.Debugf("Sorter; Dato \"%s\" en cola de trabajo", data.Index)
+			retval = http.StatusOK
+		default:
+			retval = http.StatusServiceUnavailable
+		}
+	} else {
+		select {
+		case controller.ChannelLoc <- data:
+			log.Debugf("Sorter; Dato \"%s\" en cola de trabajo de GeoReverse", data.Index)
+			retval = http.StatusOK
+		default:
+			retval = http.StatusServiceUnavailable
+		}
 	}
 
 	return retval

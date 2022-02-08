@@ -19,14 +19,16 @@ city = address.get("county")
 if city == None:
     city = address.get("city")
     if city == None:
-        city = address.get("town")
+        city = address.get("municipality")
         if city == None:
-            city = address.get("suburb")
+            city = address.get("town")
             if city == None:
-                city = address.get("village")
+                city = address.get("suburb")
                 if city == None:
-                    print("no se recibió respuesta esperada por el servicio de geo reverse")
-                    exit(1)
+                    city = address.get("village")
+                    if city == None:
+                        print("no se recibió respuesta esperada por el servicio de geo reverse")
+                        exit(1)
 
 country = address["country_code"]
 state = address["state"]

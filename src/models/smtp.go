@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"encoding/base64"
 	log "github.com/sirupsen/logrus"
+
 	"github.com/gusluker/server-bot/src/configuration"
 
 	"golang.org/x/oauth2"	
@@ -169,21 +170,14 @@ func boundary() string {
 }
 
 func (clients *GmailClients) SendInSequence(to string, data []*GData) error {
-	var msg string
-	for _, v := range data {
-		msg += "\n"
-		msg += "Content-Type: " + v.ContentType
-		if v.ContentType == "text/plain" {
-			msg += "; charset="	+ string('"') + "UTF-8" + string('"') + "\n"
-		} else if v.ContentType == "image/jpeg" {
-			msg += "; name=" + string('"') + v.Name + string('"') + "\n"
-			msg += "Content-Disposition: attachment; filename=" + string('"') + v.Name + string('"') + "\n"
-		}
+	msg := gdataToSmtpRequest(&GData {
+		ContentType: "text/plain",
+		ContentTransferEncoding: "8bit",
+		Data: "Servicio de redireccionamiento de información ServerBot",
+	})
 
-		msg += "MIME-Version: 1.0\n"
-		msg += "Content-Transfer-Encoding: " + v.ContentTransferEncoding + "\n\n" 
-		msg += v.Data + "\n\n"
-		msg += "--" + bound 
+	for _, v := range data {
+		msg += gdataToSmtpRequest(v)
 	}
 
 	msg += "--"
@@ -200,7 +194,7 @@ func (clients *GmailClients) SendInSequence(to string, data []*GData) error {
 	var err error
 	for _, c := range clients.Clients {
 		if _, err = c.Srv.Users.Messages.Send("me", &msgGmail).Do(); err == nil {
-			log.Infof("Email %s. Se envío Email", c.Email)
+			log.Infof("Email %s. Se envío Email a destinatarios %s", c.Email, to)
 			break
 		} else {
 			log.Debugf("Email %s. Falló el envío de Email: %s", c.Email, err)
@@ -225,4 +219,22 @@ func (clients *GmailClients) SendInSequence(to string, data []*GData) error {
 	}
 
 	return err
+}
+
+func gdataToSmtpRequest(data *GData) string {
+	msg := "\n"
+	msg += "Content-Type: " + data.ContentType
+	if data.ContentType == "text/plain" {
+		msg += "; charset="	+ string('"') + "UTF-8" + string('"') + "\n"
+	} else if data.ContentType == "image/jpeg" {
+		msg += "; name=" + string('"') + data.Name + string('"') + "\n"
+		msg += "Content-Disposition: attachment; filename=" + string('"') + data.Name + string('"') + "\n"
+	}
+
+	msg += "MIME-Version: 1.0\n"
+	msg += "Content-Transfer-Encoding: " + data.ContentTransferEncoding + "\n\n" 
+	msg += data.Data + "\n\n"
+	msg += "--" + bound 
+
+	return msg
 }

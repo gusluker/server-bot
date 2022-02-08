@@ -5,11 +5,11 @@ import (
 )
 
 type Data struct {
-	Index		string 		`json:index`
-	NamePlug	string 		`json:plug`
-	Coord		*GeoCoord	`json:coord`
-	Loc			*Location	`json:location`
-	Body		interface{}	`json:body`
+	Index		string 		`json:"index"`
+	NamePlug	string 		`json:"plug"`
+	Coord		*GeoCoord	`json:"coord"`
+	Loc			*Location	`json:"location"`
+	Body		interface{}	`json:"body"`
 }
 	
 func ToData(data map[string]interface{}) (*Data, error) {

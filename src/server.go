@@ -196,6 +196,7 @@ func (srv *Server) Run(data *models.Data) {
 						}
 
 						srv.GClients.SendInSequence(to, gdata)
+						//time.Sleep(1 * time.Second)
 					} else {
 						log.Errorf("Plugin %s: %s", srv.Plugins[i].GetName(), err)
 					}

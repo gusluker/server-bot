@@ -9,6 +9,8 @@ import (
 	"strings"
 	"net/http"
 	"encoding/json"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -17,16 +19,16 @@ var (
 )
 
 type Location struct {
-	Coord 		*GeoCoord	`json:coord`
-	Country 	string		`json:country`
-	CountryCode string		`json:country_code`
-	State		string		`json:state`
-	City		string		`json:city`
+	Coord 		*GeoCoord	`json:"coord"`
+	Country 	string		`json:"country"`
+	CountryCode string		`json:"country_code"`
+	State		string		`json:"state"`
+	City		string		`json:"city"`
 }
 
 type GeoCoord struct {
-	Latitude string		`json:lat`
-	Longitude string	`json:lon`
+	Latitude string		`json:"lat"`
+	Longitude string	`json:"lon"`
 }
 
 func (location *Location) GetPath() string {
@@ -45,21 +47,22 @@ func (location *Location) GetPath() string {
 const URL_SERVICE = "https://nominatim.openstreetmap.org/reverse?lat=%s&lon=%s&format=jsonv2"
 
 func GetLocation(coord *GeoCoord) (*Location, error) {
-	var lat, lon string = coord.Latitude, coord.Longitude	
-	if !_regCoordLat.MatchString(lat) || !_regCoordLong.MatchString(lon) {
+	if !_regCoordLat.MatchString(coord.Latitude) || !_regCoordLong.MatchString(coord.Longitude) {
 		return nil, errors.New("Latitud o Longitud no válidas")
 	}
 
 	var retval *Location	
 	tr := &http.Transport { IdleConnTimeout: 250 * time.Millisecond }
 	client := &http.Client{ Transport: tr }
-	res, err := client.Get(fmt.Sprintf(URL_SERVICE, lat, lon))
+	res, err := client.Get(fmt.Sprintf(URL_SERVICE, coord.Latitude, coord.Longitude))
 
 	if err == nil {
 		defer res.Body.Close()
 		if body, errR := io.ReadAll(res.Body); errR == nil {
 			var loca map[string]interface{}
-			bodyLower := strings.ToLower(string(body))
+			bodyS := string(body)
+			log.Debugf("GeoReverse Request: %s", bodyS)
+			bodyLower := strings.ToLower(bodyS)
 
 			if errR = json.Unmarshal([]byte(bodyLower), &loca); errR == nil {
 				if retval, err = checkLocationSyntax(loca); err == nil {
@@ -71,7 +74,7 @@ func GetLocation(coord *GeoCoord) (*Location, error) {
 		} else {
 			err = errR	
 		}
-	}
+	} 
 
 	return retval, err
 }
@@ -102,7 +105,7 @@ func getLocation(address map[string]interface{}) (*Location, error) {
 	var city string	
 	if city, err = getCity(address); err == nil {
 		var state string
-		if state, err = getLocationProperty(address, "state"); err == nil {
+		if state, err = getState(address); err == nil {
 			var country string
 			if country, err = getLocationProperty(address, "country"); err == nil {
 				var countryCo string
@@ -115,6 +118,13 @@ func getLocation(address map[string]interface{}) (*Location, error) {
 					}
 				}
 			} 
+		}
+	}
+
+	if err != nil {
+		if log.IsLevelEnabled(log.DebugLevel) {
+			d, _ := json.Marshal(address)
+			log.Debugf("Error de localización: %s. Dato: %s", err, string(d))
 		}
 	}
 
@@ -132,6 +142,8 @@ func getCity(address map[string]interface{}) (string, error) {
 		city, ok = cityI.(string)
 	} else if cityI, ok = address["city"]; ok {
 		city, ok = cityI.(string)
+	} else if cityI, ok = address["municipality"]; ok {
+		city, ok = cityI.(string)
 	} else if cityI, ok = address["town"]; ok {
 		city, ok = cityI.(string)
 	} else if cityI, ok = address["suburb"]; ok {
@@ -143,6 +155,19 @@ func getCity(address map[string]interface{}) (string, error) {
 	}
 
 	return city, err 
+}
+
+func getState(address map[string]interface{}) (string, error) {
+	var state string
+	var err error
+
+	if state, err = getLocationProperty(address, "state"); err != nil {
+		if state, err = getLocationProperty(address, "region"); err != nil {
+			err = errors.New("no se encontró el parámetro state en Location")
+		}
+	}
+
+	return state, err
 }
 
 func getCoord(address map[string]interface{}) (*GeoCoord, error) {
