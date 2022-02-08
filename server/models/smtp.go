@@ -11,7 +11,7 @@ import (
 	"encoding/base64"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/gusluker/server-bot/src/configuration"
+	"github.com/gusluker/server-bot/server/configuration"
 
 	"golang.org/x/oauth2"	
 	"golang.org/x/oauth2/google"

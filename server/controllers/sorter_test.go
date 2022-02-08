@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"encoding/json"
 
-	"github.com/gusluker/server-bot/src/models"
+	"github.com/gusluker/server-bot/server/models"
 
 	log "github.com/sirupsen/logrus"
 )

@@ -1,7 +1,7 @@
 package plugins
 
 import (
-	"github.com/gusluker/server-bot/src/models"	
+	"github.com/gusluker/server-bot/server/models"	
 )
 
 type Plugin interface {

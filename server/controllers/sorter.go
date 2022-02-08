@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/gusluker/server-bot/src/models"
+	"github.com/gusluker/server-bot/server/models"
 )
 
 type Sor struct {

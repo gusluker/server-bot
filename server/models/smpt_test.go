@@ -3,7 +3,7 @@ package models
 import (
 	"os"
 	"testing"
-	"github.com/gusluker/server-bot/src/configuration"
+	"github.com/gusluker/server-bot/server/configuration"
 )
 
 func TestSmtpInit(t *testing.T) {

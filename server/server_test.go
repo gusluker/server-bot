@@ -9,8 +9,8 @@ import (
 	"math/rand"	
 	"encoding/json"
 
-	"github.com/gusluker/server-bot/src/models"
-	"github.com/gusluker/server-bot/src/plugins"
+	"github.com/gusluker/server-bot/server/models"
+	"github.com/gusluker/server-bot/server/plugins"
 
 	"github.com/gin-gonic/gin"
 	"github.com/appleboy/gofight/v2"

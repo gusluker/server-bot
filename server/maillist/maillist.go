@@ -5,7 +5,7 @@ import (
 	"errors"
 	"regexp"
 	"strings"
-	"github.com/gusluker/server-bot/src/configuration"	
+	"github.com/gusluker/server-bot/server/configuration"	
 )
 
 var (

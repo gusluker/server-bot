@@ -9,11 +9,11 @@ import (
 	"log/syslog"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/gusluker/server-bot/src/models"
-	"github.com/gusluker/server-bot/src/plugins"
-	"github.com/gusluker/server-bot/src/maillist"
-	"github.com/gusluker/server-bot/src/controllers"
-	"github.com/gusluker/server-bot/src/configuration"
+	"github.com/gusluker/server-bot/server/models"
+	"github.com/gusluker/server-bot/server/plugins"
+	"github.com/gusluker/server-bot/server/maillist"
+	"github.com/gusluker/server-bot/server/controllers"
+	"github.com/gusluker/server-bot/server/configuration"
 
 	"github.com/gin-gonic/gin"
 )

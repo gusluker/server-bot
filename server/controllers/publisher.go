@@ -3,7 +3,7 @@ package controllers
 import (
 	"sync"
 
-	"github.com/gusluker/server-bot/src/models"
+	"github.com/gusluker/server-bot/server/models"
 
 	log "github.com/sirupsen/logrus"
 )

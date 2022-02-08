@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gusluker/server-bot/src/configuration"
+	"github.com/gusluker/server-bot/server/configuration"
 )
 
 type TestMailListType struct {
