@@ -86,7 +86,7 @@ El archivo posee la siguiente estrucutra JSON:
 
 ## Documentación
 
-La inicialización del servicio ServerBot se realizar mediante la función `New([]plugins.Plugin, *gin.Engine) *Server`, este inicializa el servicio y lo enruta al recurso `/sorter`. Retorna un PANIC si encuentra un error en la configuración.
+La inicialización del servicio ServerBot se realizar mediante la función `New([]plugins.Plugin, *gin.Engine) *Server`, este inicializa el servicio y lo enruta al recurso `/sorter`. Retorna un **panic** si encuentra un error en la configuración.
 
 El recurso `/sorter` **solo** recibe peticiones POST con contenido de tipo `application/json` que posean la siguiente estructura:
 
@@ -115,7 +115,7 @@ El recurso `/sorter` **solo** recibe peticiones POST con contenido de tipo `appl
 - **index**. Nombre que se usará para registrar los datos en sistemas.
 - **plug**. Nombre del plugin que procesará los datos antes de ser enviados por SMTP.
 - **coord**. Puede no ser definida si se define **location**. Coordenadas geográfica que se usarán para consultar la información geográfica en el servicio de georeferenciación.
-- **location**. Puede no ser definida si se define **coord**. Este campo se define para que el servidor no realice una consulta al servicio de georeferenciación, el cual es muy lento. Use como ejemplo el script **script/get* para saber cómo consultar esta información.
+- **location**. Puede no ser definida si se define **coord**. Este campo se define para que el servidor no realice una consulta al servicio de georeferenciación, el cual es muy lento. Use como ejemplo el script **script/get** para saber cómo consultar esta información.
 - **data**. Datos cualquiera que serán procesados por el plugin que concuerde con el nombre en **plug**.
 
 ### Plugins
@@ -127,11 +127,11 @@ Los plugins son pasados como parámetros al inicializar el servicio y son usados
 ```golang
 type Plug interface {
 	IsThisPlugin(data *models.Data)	bool
-	Run(data *models.Data)			([]*models.GData, error)
-	GetName() 						string
+	Run(data *models.Data)		([]*models.GData, error)
+	GetName() 					string
 }
 
-//Tipo de dato Data en server/models/data.go
+//Tipo de dato en server/models/data.go
 type Data struct {
 	Index		string 		
 	NamePlug	string 	
@@ -140,7 +140,7 @@ type Data struct {
 	Body		interface{}	
 }
 
-//Tipo de dato Location en server/models/location.go
+//Tipo de dato en server/models/location.go
 type Location struct {
 	Coord 		*GeoCoord
 	Country 	string
@@ -149,15 +149,15 @@ type Location struct {
 	City		string
 }
 
-//Tipo de dato GeoCoord en server/models/geocoord.go
+//Tipo de dato en server/models/geocoord.go
 type GeoCoord struct {
 	Latitude string
 	Longitude string
 }
 ```
-- **IsThisPlug**. Función que recibe un tipo de dato `Data` y retorna un booleano en caso que pueda ser procesado por este plugin.
+- **IsThisPlug**. Función que recibe un tipo de dato `Data` y retorna un booleano `true` en caso que pueda ser procesado por este plugin.
 - **Run**. Función que recibe un tipo de dato `Data` y retorna un array de `GData` listos para su envío a través de smtp. En caso contrario, retorna error.
-- **GetName**. Función que retorna el nombre del plugin.
+- **GetName**. Función que retorna el nombre del plugin. Este nombre debe concordar con el nombre recibido en el parámetro **plug**.
 
 La función **Run** procesa los datos y retorna un tipo de dato `GData` usado para el envío a través de smtp. Este posee la siguiente estructura:
 
@@ -172,7 +172,7 @@ type GData struct {
 
 Un `GData` representa un archivo adjunto o texto, el cual será indicado por sus respectivo valores:
 
-- **ContentType**. Encabezado que representa qué [tipo de dato](https://es.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#Content-Type) representa el mensaje.
+- **ContentType**. Encabezado que representa qué [tipo de medio](https://es.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#Content-Type) representa el mensaje.
 - **ContentTransferEncoding**. Encabezado que representa el [tipo de condificación](https://es.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#Content-Transfer-Encoding) usada en el mensaje.
-- **Name**. Encabezado que representa el nombre del mensaje. No es necesario para **ContentType: text/plain**
-- **Data**. Encabezado que representa el archivo adjunto. Su condificación es representada por **ContentTransferEncoding**
+- **Name**. Encabezado que representa el nombre del mensaje. Este campo se puede dejar vaciío para `ContentType: text/plain`.
+- **Data**. Encabezado que representa el archivo adjunto. Su condificación es representada por `ContentTransferEncoding`.
