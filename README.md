@@ -128,7 +128,7 @@ Los plugins son pasados como parámetros al inicializar el servicio y son usados
 type Plug interface {
 	IsThisPlugin(data *models.Data)	bool
 	Run(data *models.Data)		([]*models.GData, error)
-	GetName() 					string
+	GetName() 			string
 }
 
 //Tipo de dato en server/models/data.go
@@ -136,7 +136,7 @@ type Data struct {
 	Index		string 		
 	NamePlug	string 	
 	Coord		*GeoCoord	
-	Loc			*Location
+	Loc		*Location
 	Body		interface{}	
 }
 
@@ -144,15 +144,15 @@ type Data struct {
 type Location struct {
 	Coord 		*GeoCoord
 	Country 	string
-	CountryCode string
+	CountryCode	string
 	State		string
 	City		string
 }
 
 //Tipo de dato en server/models/geocoord.go
 type GeoCoord struct {
-	Latitude string
-	Longitude string
+	Latitude	string
+	Longitude 	string
 }
 ```
 - **IsThisPlug**. Función que recibe un tipo de dato `Data` y retorna un booleano `true` en caso que pueda ser procesado por este plugin.
@@ -163,10 +163,10 @@ La función **Run** procesa los datos y retorna un tipo de dato `GData` usado pa
 
 ```golang
 type GData struct {
-	ContentType 			string
+	ContentType 		string
 	ContentTransferEncoding	string
-	Name					string
-	Data 					string
+	Name			string
+	Data 			string
 }
 ```
 
